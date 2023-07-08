@@ -1,6 +1,9 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 
+const scoreEl = document.querySelector("#scoreEl");
+console.log(scoreEl);
+
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
@@ -10,23 +13,25 @@ canvas.height = innerHeight;
 class Boundary {
   static width = 40;
   static height = 40;
-  constructor({ position }) {
+  constructor({ position, image }) {
     this.position = position;
     this.width = 40;
     this.height = 40;
+    this.image = image;
   }
 
   /**
    * Creating rectangles for boundary
    */
   draw() {
-    c.fillStyle = "blue";
-    c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    //   c.fillStyle = "blue";
+    //   c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    c.drawImage(this.image, this.position.x, this.position.y);
   }
 }
 
 /**
- * Control the Player
+ * Create the Player Blueprint
  */
 class Player {
   constructor({ position, velocity }) {
@@ -52,7 +57,102 @@ class Player {
   }
 }
 
+/**
+ * Create the Ghost Blueprint
+ */
+class Ghost {
+  static speed = 2;
+  constructor({ position, velocity, color = "red" }) {
+    this.position = position;
+    this.velocity = velocity;
+    this.radius = 16;
+    this.color = color;
+    this.prevCollisions = [];
+    this.speed = 2;
+    this.scared = false;
+  }
+
+  // Drawing Pacman
+  draw() {
+    c.beginPath();
+    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    c.fillStyle = this.color;
+    c.fill();
+    c.closePath();
+  }
+
+  // Moving Pacman
+  update() {
+    this.draw();
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+  }
+}
+
+/**
+ * Create pellet blueprint
+ */
+class Pellet {
+  constructor({ position }) {
+    this.position = position;
+    this.radius = 3;
+  }
+
+  // Drawing Pellet
+  draw() {
+    c.beginPath();
+    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    c.fillStyle = "pink";
+    c.fill();
+    c.closePath();
+  }
+}
+
+/**
+ * Create power up blueprint
+ */
+class PowerUp {
+  constructor({ position }) {
+    this.position = position;
+    this.radius = 8;
+  }
+
+  // Drawing Pellet
+  draw() {
+    c.beginPath();
+    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    c.fillStyle = "white";
+    c.fill();
+    c.closePath();
+  }
+}
+
+const pellets = [];
 const boundaries = [];
+const powerUps = [];
+const ghosts = [
+  new Ghost({
+    position: {
+      x: Boundary.width * 6 + Boundary.width / 2,
+      y: Boundary.height + Boundary.height / 2,
+    },
+    velocity: {
+      x: Ghost.speed,
+      y: 0,
+    },
+  }),
+  new Ghost({
+    position: {
+      x: Boundary.width * 6 + Boundary.width / 2,
+      y: Boundary.height * 3 + Boundary.height / 2,
+    },
+    velocity: {
+      x: Ghost.speed,
+      y: 0,
+    },
+    color: "green",
+  }),
+];
 // Create player object
 const player = new Player({
   position: {
@@ -82,17 +182,30 @@ const keys = {
 };
 
 let lastKey = "";
+let score = 0;
 
 // Draw the map
 const map = [
-  ["-", "-", "-", "-", "-", "-", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", "-", " ", "-", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", " ", "-", " ", "-", " ", "-"],
-  ["-", " ", " ", " ", " ", " ", "-"],
-  ["-", "-", "-", "-", "-", "-", "-"],
+  ["1", "-", "-", "-", "-", "-", "-", "-", "-", "-", "2"],
+  ["|", ".", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "7", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
+  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
+  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "+", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
+  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
+  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", ".", ".", ".", ".", "p", "|"],
+  ["4", "-", "-", "-", "-", "-", "-", "-", "-", "-", "3"],
 ];
+
+function createImage(src) {
+  const image = new Image();
+  image.src = src;
+  return image;
+}
 
 map.forEach((row, i) => {
   row.forEach((symbol, j) => {
@@ -103,6 +216,195 @@ map.forEach((row, i) => {
             position: {
               x: Boundary.width * j,
               y: Boundary.height * i,
+            },
+            image: createImage("./img/pipeHorizontal.png"),
+          })
+        );
+        break;
+      case "|":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: Boundary.width * j,
+              y: Boundary.height * i,
+            },
+            image: createImage("./img/pipeVertical.png"),
+          })
+        );
+        break;
+      case "1":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: Boundary.width * j,
+              y: Boundary.height * i,
+            },
+            image: createImage("./img/pipeCorner1.png"),
+          })
+        );
+        break;
+      case "2":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: Boundary.width * j,
+              y: Boundary.height * i,
+            },
+            image: createImage("./img/pipeCorner2.png"),
+          })
+        );
+        break;
+      case "3":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: Boundary.width * j,
+              y: Boundary.height * i,
+            },
+            image: createImage("./img/pipeCorner3.png"),
+          })
+        );
+        break;
+      case "4":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: Boundary.width * j,
+              y: Boundary.height * i,
+            },
+            image: createImage("./img/pipeCorner4.png"),
+          })
+        );
+        break;
+      case "b":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: Boundary.width * j,
+              y: Boundary.height * i,
+            },
+            image: createImage("./img/block.png"),
+          })
+        );
+        break;
+      case "[":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            image: createImage("./img/capLeft.png"),
+          })
+        );
+        break;
+      case "]":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            image: createImage("./img/capRight.png"),
+          })
+        );
+        break;
+      case "_":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            image: createImage("./img/capBottom.png"),
+          })
+        );
+        break;
+      case "^":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            image: createImage("./img/capTop.png"),
+          })
+        );
+        break;
+      case "+":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            image: createImage("./img/pipeCross.png"),
+          })
+        );
+        break;
+      case "5":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            color: "blue",
+            image: createImage("./img/pipeConnectorTop.png"),
+          })
+        );
+        break;
+      case "6":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            color: "blue",
+            image: createImage("./img/pipeConnectorRight.png"),
+          })
+        );
+        break;
+      case "7":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            color: "blue",
+            image: createImage("./img/pipeConnectorBottom.png"),
+          })
+        );
+        break;
+      case "8":
+        boundaries.push(
+          new Boundary({
+            position: {
+              x: j * Boundary.width,
+              y: i * Boundary.height,
+            },
+            image: createImage("./img/pipeConnectorLeft.png"),
+          })
+        );
+        break;
+      case ".":
+        pellets.push(
+          new Pellet({
+            position: {
+              x: j * Boundary.width + Boundary.width / 2,
+              y: i * Boundary.height + Boundary.height / 2,
+            },
+          })
+        );
+        break;
+      case "p":
+        powerUps.push(
+          new PowerUp({
+            position: {
+              x: j * Boundary.width + Boundary.width / 2,
+              y: i * Boundary.height + Boundary.height / 2,
             },
           })
         );
@@ -115,23 +417,27 @@ map.forEach((row, i) => {
  * Check if the pacman is colliding with boundaries
  */
 function circleCollidesWithRectangle({ circle, rectangle }) {
+  const padding = Boundary.width / 2 - circle.radius - 1;
   return (
     circle.position.y - circle.radius + circle.velocity.y <=
-      rectangle.position.y + rectangle.height &&
+      rectangle.position.y + rectangle.height + padding &&
     circle.position.x + circle.radius + circle.velocity.x >=
-      rectangle.position.x &&
+      rectangle.position.x - padding &&
     circle.position.y + circle.radius + circle.velocity.y >=
-      rectangle.position.y &&
+      rectangle.position.y - padding &&
     circle.position.x - circle.radius + circle.velocity.x <=
-      rectangle.position.x + rectangle.width
+      rectangle.position.x + rectangle.width + padding
   );
 }
 
 /**
  *
  */
+
+let animationId;
 function animate() {
-  requestAnimationFrame(animate);
+  animationId = requestAnimationFrame(animate);
+  console.log(animationId);
   c.clearRect(0, 0, canvas.width, canvas.height);
 
   if (keys.w.pressed && lastKey === "w") {
@@ -220,6 +526,50 @@ function animate() {
     }
   }
 
+  // Generate Power Up
+  for (let i = powerUps.length - 1; 0 <= i; i--) {
+    const powerUp = powerUps[i];
+    powerUp.draw();
+    // Player collides with PowerUp
+    if (
+      Math.hypot(
+        powerUp.position.x - player.position.x,
+        powerUp.position.y - player.position.y
+      ) <
+      powerUp.radius + player.radius
+    ) {
+      powerUps.splice(i, 1);
+
+      // Make ghosts scared
+      ghosts.forEach((ghost) => {
+        ghost.scared = true;
+
+        setTimeout(() => {
+          ghost.scared = false;
+        }, 3000);
+      });
+    }
+  }
+
+  // Touch pellets here
+  for (let i = pellets.length - 1; 0 <= i; i--) {
+    const pellet = pellets[i];
+    pellet.draw();
+
+    if (
+      Math.hypot(
+        pellet.position.x - player.position.x,
+        pellet.position.y - player.position.y
+      ) <
+      pellet.radius + player.radius
+    ) {
+      console.log("touching");
+      pellets.splice(i, 1);
+      score += 10;
+      scoreEl.innerHTML = score;
+    }
+  }
+
   boundaries.forEach((boundary) => {
     boundary.draw();
     if (circleCollidesWithRectangle({ circle: player, rectangle: boundary })) {
@@ -230,8 +580,129 @@ function animate() {
   });
 
   player.update();
-  // player.velocity.y = 0;
-  // player.velocity.x = 0;
+
+  ghosts.forEach((ghost) => {
+    ghost.update();
+
+    if (
+      Math.hypot(
+        ghost.position.x - player.position.x,
+        ghost.position.y - player.position.y
+      ) <
+      ghost.radius + player.radius
+    ) {
+      cancelAnimationFrame(animationId);
+      console.log("You lose!");
+    }
+
+    const collisions = [];
+    boundaries.forEach((boundary) => {
+      if (
+        !collisions.includes("right") &&
+        circleCollidesWithRectangle({
+          circle: {
+            ...ghost,
+            velocity: {
+              x: ghost.speed,
+              y: 0,
+            },
+          },
+          rectangle: boundary,
+        })
+      ) {
+        collisions.push("right");
+      }
+
+      if (
+        !collisions.includes("left") &&
+        circleCollidesWithRectangle({
+          circle: {
+            ...ghost,
+            velocity: {
+              x: -ghost.speed,
+              y: 0,
+            },
+          },
+          rectangle: boundary,
+        })
+      ) {
+        collisions.push("left");
+      }
+
+      if (
+        !collisions.includes("up") &&
+        circleCollidesWithRectangle({
+          circle: {
+            ...ghost,
+            velocity: {
+              x: 0,
+              y: -ghost.speed,
+            },
+          },
+          rectangle: boundary,
+        })
+      ) {
+        collisions.push("up");
+      }
+
+      if (
+        !collisions.includes("down") &&
+        circleCollidesWithRectangle({
+          circle: {
+            ...ghost,
+            velocity: {
+              x: 0,
+              y: ghost.speed,
+            },
+          },
+          rectangle: boundary,
+        })
+      ) {
+        collisions.push("down");
+      }
+    });
+    if (collisions.length > ghost.prevCollisions.length)
+      ghost.prevCollisions = collisions;
+
+    if (JSON.stringify(collisions) !== JSON.stringify(ghost.prevCollisions)) {
+      console.log(collisions);
+      console.log(ghost.prevCollisions);
+
+      if (ghost.velocity.x > 0) ghost.prevCollisions.push("right");
+      else if (ghost.velocity.x < 0) ghost.prevCollisions.push("left");
+      else if (ghost.velocity.y < 0) ghost.prevCollisions.push("up");
+      else if (ghost.velocity.y > 0) ghost.prevCollisions.push("down");
+
+      const pathways = ghost.prevCollisions.filter((collision) => {
+        return !collisions.includes(collision);
+      });
+      console.log({ pathways });
+
+      const direction = pathways[Math.floor(Math.random() * pathways.length)];
+
+      console.log(direction);
+
+      switch (direction) {
+        case "down":
+          ghost.velocity.y = ghost.speed;
+          ghost.velocity.x = 0;
+          break;
+        case "up":
+          ghost.velocity.y = -ghost.speed;
+          ghost.velocity.x = 0;
+          break;
+        case "right":
+          ghost.velocity.y = 0;
+          ghost.velocity.x = ghost.speed;
+          break;
+        case "left":
+          ghost.velocity.y = 0;
+          ghost.velocity.x = -ghost.speed;
+          break;
+      }
+      ghost.prevCollisions = [];
+    }
+  });
 }
 
 animate();
