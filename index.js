@@ -18,7 +18,10 @@ const map = [
   ["4", "-", "-", "-", "-", "-", "-", "-", "-", "-", "3"],
 ];
 const scoreEl = document.querySelector("#scoreEl");
-console.log("score: ", scoreEl);
+const finalScore = document.querySelector("#finalScoreEl");
+const startButton = document.querySelector("#startButton");
+const winOrLoseMessage = document.querySelector("#winOrLoseMessage");
+
 canvas.width = map[0].length * mapGridSize;
 canvas.height = map.length * mapGridSize;
 
@@ -560,6 +563,7 @@ function animate() {
         cancelAnimationFrame(animationId);
         winOrLoseMessage.innerHTML = "You Lose!";
         // scoreEl.innerHTML = score;
+        finalScore.innerHTML = score;
         startButton.innerHTML = "RESTART GAME";
       }
     }
@@ -569,6 +573,8 @@ function animate() {
 
   if (pellets.length === 0) {
     // scoreEl.innerHTML = score;
+    finalScoreEl.innerHTML = score;
+
     winOrLoseMessage.innerHTML = "You Win!";
     startButton.innerHTML = "RESTART GAME";
     cancelAnimationFrame(animationId);
