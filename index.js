@@ -49,6 +49,25 @@ class Boundary {
 }
 
 /**
+ * Create Flowers for the game
+ */
+class Flower {
+  constructor({ position, image }) {
+    this.position = position;
+    this.image = image;
+  }
+
+  /**
+   * Creating rectangles for boundary
+   */
+  draw() {
+    const drawX = this.image.width / 2; // Adjust X position based on the anchor point
+    const drawY = this.image.height / 2;
+    c.drawImage(this.image, this.position.x - drawX, this.position.y - drawY);
+  }
+}
+
+/**
  * Create the Player Blueprint
  */
 class Player {
@@ -411,11 +430,12 @@ map.forEach((row, i) => {
         break;
       case ".":
         pellets.push(
-          new Pellet({
+          new Flower({
             position: {
               x: j * Boundary.width + Boundary.width / 2,
               y: i * Boundary.height + Boundary.height / 2,
             },
+            image: createImage("./img/flowerSmall.png"),
           })
         );
         break;
@@ -610,12 +630,16 @@ function animate() {
     const pellet = pellets[i];
     pellet.draw();
 
+    // if (
+    //   Math.hypot(
+    //     pellet.position.x - player.position.x,
+    //     pellet.position.y - player.position.y
+    //   ) <
+    //   pellet.radius + player.radius
+    // )
     if (
-      Math.hypot(
-        pellet.position.x - player.position.x,
-        pellet.position.y - player.position.y
-      ) <
-      pellet.radius + player.radius
+      pellet.position.x === player.position.x &&
+      pellet.position.y === player.position.y
     ) {
       pellets.splice(i, 1);
       score += 10;
