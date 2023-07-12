@@ -27,8 +27,8 @@
 
 body {
   margin: 0;
-  background-color: black;
-  /* background-image: url("https://www.transparenttextures.com/patterns/light-wool.png"); */
+  background-color: #000000;
+  background-image: url("https://www.transparenttextures.com/patterns/green-dust-and-scratches.png");
   padding: 10px 20px;
 }
 
@@ -39,8 +39,8 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  visibility: hidden;
-  position: absolute;
+  /* visibility: hidden;
+  position: absolute; */
 }
 
 p {

@@ -18,7 +18,7 @@ const map = [
   ["4", "-", "-", "-", "-", "-", "-", "-", "-", "-", "3"],
 ];
 const scoreEl = document.querySelector("#scoreEl");
-console.log(scoreEl);
+console.log("score: ", scoreEl);
 canvas.width = map[0].length * mapGridSize;
 canvas.height = map.length * mapGridSize;
 
@@ -454,7 +454,7 @@ function circleCollidesWithRectangle({ circle, rectangle }) {
 let animationId;
 function animate() {
   animationId = requestAnimationFrame(animate);
-  console.log(animationId);
+  // console.log(animationId);
   c.clearRect(0, 0, canvas.width, canvas.height);
 
   if (keys.w.pressed && lastKey === "w") {
@@ -558,7 +558,9 @@ function animate() {
         ghosts.splice(i, 1);
       } else {
         cancelAnimationFrame(animationId);
-        console.log("You lose!");
+        winOrLoseMessage.innerHTML = "You Lose!";
+        // scoreEl.innerHTML = score;
+        startButton.innerHTML = "RESTART GAME";
       }
     }
   }
@@ -566,7 +568,9 @@ function animate() {
   // Win condition - all pellets are eaten
 
   if (pellets.length === 0) {
-    console.log("You win!");
+    // scoreEl.innerHTML = score;
+    winOrLoseMessage.innerHTML = "You Win!";
+    startButton.innerHTML = "RESTART GAME";
     cancelAnimationFrame(animationId);
   }
 
@@ -607,7 +611,6 @@ function animate() {
       ) <
       pellet.radius + player.radius
     ) {
-      console.log("touching");
       pellets.splice(i, 1);
       score += 10;
       scoreEl.innerHTML = score;
@@ -617,7 +620,6 @@ function animate() {
   boundaries.forEach((boundary) => {
     boundary.draw();
     if (circleCollidesWithRectangle({ circle: player, rectangle: boundary })) {
-      console.log("we are colliding");
       player.velocity.x = 0;
       player.velocity.y = 0;
     }
@@ -698,9 +700,6 @@ function animate() {
       ghost.prevCollisions = collisions;
 
     if (JSON.stringify(collisions) !== JSON.stringify(ghost.prevCollisions)) {
-      console.log(collisions);
-      console.log(ghost.prevCollisions);
-
       if (ghost.velocity.x > 0) ghost.prevCollisions.push("right");
       else if (ghost.velocity.x < 0) ghost.prevCollisions.push("left");
       else if (ghost.velocity.y < 0) ghost.prevCollisions.push("up");
@@ -709,11 +708,8 @@ function animate() {
       const pathways = ghost.prevCollisions.filter((collision) => {
         return !collisions.includes(collision);
       });
-      console.log({ pathways });
 
       const direction = pathways[Math.floor(Math.random() * pathways.length)];
-
-      console.log(direction);
 
       switch (direction) {
         case "down":
@@ -780,6 +776,14 @@ window.addEventListener("keyup", ({ key }) => {
       keys.d.pressed = false;
       break;
   }
-  console.log(keys.d.pressed);
-  console.log(keys.s.pressed);
 });
+
+var handler = function () {
+  var date = new Date();
+  var sec = date.getSeconds();
+  var min = date.getMinutes();
+  document.getElementById("time").textContent =
+    (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec);
+};
+setInterval(handler, 1000);
+handler();
