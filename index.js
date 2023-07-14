@@ -21,9 +21,29 @@ const scoreEl = document.querySelector("#scoreEl");
 const finalScore = document.querySelector("#finalScoreEl");
 const startButton = document.querySelector("#startButton");
 const winOrLoseMessage = document.querySelector("#winOrLoseMessage");
+const timerElement = document.getElementById("timer");
 
 canvas.width = map[0].length * mapGridSize;
 canvas.height = map.length * mapGridSize;
+
+// Timer
+
+let startTime;
+let timerInterval;
+
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 100);
+}
+
+function updateTimer() {
+  const currentTime = Date.now();
+  const elapsedTime = (currentTime - startTime) / 1000;
+  const elaspedTimeFormatted = elapsedTime.toFixed(1);
+  timerElement.textContent = elaspedTimeFormatted + " seconds";
+}
+
+startTimer();
 
 /**
  * Create Boundaries for the game
@@ -471,7 +491,7 @@ function circleCollidesWithRectangle({ circle, rectangle }) {
 }
 
 /**
- *
+ *Moving Pac-Girl
  */
 
 let animationId;
@@ -581,8 +601,13 @@ function animate() {
         ghosts.splice(i, 1);
       } else {
         cancelAnimationFrame(animationId);
+        clearInterval(timerInterval); // Stop updating the timer when the game is lost
+        const endTime = Date.now(); // Get the current timestamp when the game ends
+        const duration = (endTime - startTime) / 1000;
+        const durationFormatted = duration.toFixed(1);
+        time.innerHTML = durationFormatted + " seconds";
+        finalScoreEl.innerHTML = score;
         winOrLoseMessage.innerHTML = "You Lose!";
-        // scoreEl.innerHTML = score;
         finalScore.innerHTML = score;
         startButton.innerHTML = "RESTART GAME";
       }
@@ -592,12 +617,15 @@ function animate() {
   // Win condition - all pellets are eaten
 
   if (pellets.length === 0) {
-    // scoreEl.innerHTML = score;
+    cancelAnimationFrame(animationId);
+    clearInterval(timerInterval); // Stop updating the timer when the game is won
+    const endTime = Date.now(); // Get the current timestamp when the game ends
+    const duration = (endTime - startTime) / 1000;
+    const durationFormatted = duration.toFixed(1);
+    time.innerHTML = durationFormatted + " seconds";
     finalScoreEl.innerHTML = score;
-
     winOrLoseMessage.innerHTML = "You Win!";
     startButton.innerHTML = "RESTART GAME";
-    cancelAnimationFrame(animationId);
   }
 
   // Generate Power Up
@@ -807,13 +835,3 @@ window.addEventListener("keyup", ({ key }) => {
       break;
   }
 });
-
-var handler = function () {
-  var date = new Date();
-  var sec = date.getSeconds();
-  var min = date.getMinutes();
-  document.getElementById("time").textContent =
-    (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec);
-};
-setInterval(handler, 1000);
-handler();
