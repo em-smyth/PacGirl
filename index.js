@@ -1,5 +1,31 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
+
+let startTime;
+let timerInterval;
+
+function startGame() {
+  animate();
+  // Timer
+
+  function startTimer() {
+    startTime = Date.now();
+    timerInterval = setInterval(updateTimer, 100);
+  }
+
+  function updateTimer() {
+    const currentTime = Date.now();
+    const elapsedTime = (currentTime - startTime) / 1000;
+    const elaspedTimeFormatted = elapsedTime.toFixed(1);
+    timerElement.textContent = elaspedTimeFormatted + " seconds";
+  }
+
+  startTimer();
+}
+
+const startButton = document.getElementById("startButton");
+startButton.addEventListener("click", startGame);
+
 // Draw the map
 const mapGridSize = 40;
 const map = [
@@ -19,31 +45,11 @@ const map = [
 ];
 const scoreEl = document.querySelector("#scoreEl");
 const finalScore = document.querySelector("#finalScoreEl");
-const startButton = document.querySelector("#startButton");
 const winOrLoseMessage = document.querySelector("#winOrLoseMessage");
 const timerElement = document.getElementById("timer");
 
 canvas.width = map[0].length * mapGridSize;
 canvas.height = map.length * mapGridSize;
-
-// Timer
-
-let startTime;
-let timerInterval;
-
-function startTimer() {
-  startTime = Date.now();
-  timerInterval = setInterval(updateTimer, 100);
-}
-
-function updateTimer() {
-  const currentTime = Date.now();
-  const elapsedTime = (currentTime - startTime) / 1000;
-  const elaspedTimeFormatted = elapsedTime.toFixed(1);
-  timerElement.textContent = elaspedTimeFormatted + " seconds";
-}
-
-startTimer();
 
 /**
  * Create Boundaries for the game
@@ -241,7 +247,7 @@ const player = new Player({
   },
 });
 
-// Define an object to keep movment keys state
+// Define an object to keep movement keys state
 const keys = {
   w: {
     pressed: false,
@@ -260,6 +266,7 @@ const keys = {
 let lastKey = "";
 let score = 0;
 
+// Populate map with icons & boundaries
 function createImage(src) {
   const image = new Image();
   image.src = src;
@@ -795,8 +802,6 @@ function animate() {
   else if (player.velocity.y > 0) player.rotation = Math.PI / 2;
   else if (player.velocity.y < 0) player.rotation = Math.PI * 1.5;
 }
-
-animate();
 
 window.addEventListener("keydown", ({ key }) => {
   switch (key) {

@@ -12,6 +12,7 @@
   font-size: 18px;
   background-color: black;
   margin: 20px;
+  cursor: pointer;
 }
 
 .btn:hover {
