@@ -8,6 +8,11 @@ function startGame() {
   animate();
   // Timer
 
+  canvasContainer.classList.remove("hidden");
+  gameBoardScore.classList.remove("hidden");
+  gameBoardTime.classList.remove("hidden");
+  menuContainer.classList.add("hidden");
+
   function startTimer() {
     startTime = Date.now();
     timerInterval = setInterval(updateTimer, 100);
@@ -47,6 +52,10 @@ const scoreEl = document.querySelector("#scoreEl");
 const finalScore = document.querySelector("#finalScoreEl");
 const winOrLoseMessage = document.querySelector("#winOrLoseMessage");
 const timerElement = document.getElementById("timer");
+var canvasContainer = document.getElementById("canvasContainer");
+var gameBoardScore = document.getElementById("gameBoardScore");
+var gameBoardTime = document.getElementById("gameBoardTime");
+var menuContainer = document.getElementById("menuContainer");
 
 canvas.width = map[0].length * mapGridSize;
 canvas.height = map.length * mapGridSize;
@@ -617,6 +626,10 @@ function animate() {
         winOrLoseMessage.innerHTML = "You Lose!";
         finalScore.innerHTML = score;
         startButton.innerHTML = "RESTART GAME";
+        menuContainer.classList.remove("hidden");
+        canvasContainer.classList.add("hidden");
+        gameBoardScore.classList.add("hidden");
+        gameBoardTime.classList.add("hidden");
       }
     }
   }
@@ -633,6 +646,10 @@ function animate() {
     finalScoreEl.innerHTML = score;
     winOrLoseMessage.innerHTML = "You Win!";
     startButton.innerHTML = "RESTART GAME";
+    menuContainer.classList.remove("hidden");
+    canvasContainer.classList.add("hidden");
+    gameBoardScore.classList.add("hidden");
+    gameBoardTime.classList.add("hidden");
   }
 
   // Generate Power Up

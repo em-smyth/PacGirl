@@ -10,12 +10,16 @@
 
 <div class="gameContainer">
   <h1>PAC-GIRL</h1>
-  <canvas></canvas>
-  <p><span>Score: </span><span id="scoreEl">0</span></p>
-  <p><span>Time: </span><span id="timer">0:0</span></p>
+  <canvas id="canvasContainer" class="hidden"></canvas>
+  <p id="gameBoardScore" class="hidden">
+    <span>Score: </span><span id="scoreEl">0</span>
+  </p>
+  <p id="gameBoardTime" class="hidden">
+    <span>Time: </span><span id="timer">0:0</span>
+  </p>
 </div>
 
-<div class="menuContainer">
+<div id="menuContainer">
   <div class="menu">
     <div class="images">
       <img id="pacGirl" src="./img/pacGirl.png" alt="" />
