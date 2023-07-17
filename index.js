@@ -1,18 +1,22 @@
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 
+// Graphic assets
+const ghostImage = "./img/ghostSmall.png";
+const ghostScaredImage = "./img/ghostSmallScared.png";
+
 let startTime;
 let timerInterval;
 
 function startGame() {
   animate();
-  // Timer
 
   canvasContainer.classList.remove("hidden");
   gameBoardScore.classList.remove("hidden");
   gameBoardTime.classList.remove("hidden");
   menuContainer.classList.add("hidden");
 
+  // Timer
   function startTimer() {
     startTime = Date.now();
     timerInterval = setInterval(updateTimer, 100);
@@ -153,51 +157,64 @@ class Player {
  */
 class Ghost {
   static speed = 2;
-  constructor({ position, velocity, color = "red" }) {
+  constructor({ position, velocity, image }) {
     this.position = position;
     this.velocity = velocity;
+    this.image = image;
     this.radius = 16;
-    this.color = color;
     this.prevCollisions = [];
     this.speed = 2;
     this.scared = false;
   }
 
-  // Drawing Pacman
+  // Drawing the Ghost
   draw() {
+    const drawX = this.image.width / 2; // Adjust X position based on the anchor point
+    const drawY = this.image.height / 2;
     c.beginPath();
+    c.drawImage(this.image, this.position.x - drawX, this.position.y - drawY);
+    //c.fillStyle = "rgba(255, 0, 0, 0.5)"; // Adjust the opacity as needed
     c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    c.fillStyle = this.scared ? "orange" : this.color;
-    c.fill();
-    c.closePath();
+    //c.fillStyle = this.scared ? "orange" : this.color;
+    //c.fillStyle = this.scared ? "orange" : this.color;
+    //c.fill();
   }
 
-  // Moving Pacman
+  // Moving the Ghost
   update() {
     this.draw();
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
   }
-}
 
-/**
- * Create pellet blueprint
- */
-class Pellet {
-  constructor({ position }) {
-    this.position = position;
-    this.radius = 3;
-  }
-
-  // Drawing Pellet
-  draw() {
-    c.beginPath();
-    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    c.fillStyle = "pink";
-    c.fill();
-    c.closePath();
+  setGhostScared(isScared) {
+    console.log("sourceImage: ", this.image.src);
+    if (isScared) {
+      (this.image = createImage(ghostScaredImage)), c.closePath();
+    } else {
+      (this.image = createImage(ghostImage)), c.closePath();
+    }
   }
 }
+
+// /**
+//  * Create pellet blueprint
+//  */
+// class Pellet {
+//   constructor({ position }) {
+//     this.position = position;
+//     this.radius = 3;
+//   }
+
+//   // Drawing Pellet
+//   draw() {
+//     c.beginPath();
+//     c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+//     c.fillStyle = "pink";
+//     c.fill();
+//     c.closePath();
+//   }
+// }
 
 /**
  * Create power up blueprint
@@ -231,6 +248,7 @@ const ghosts = [
       x: Ghost.speed,
       y: 0,
     },
+    image: createImage(ghostImage),
   }),
   new Ghost({
     position: {
@@ -241,7 +259,7 @@ const ghosts = [
       x: Ghost.speed,
       y: 0,
     },
-    color: "green",
+    image: createImage(ghostImage),
   }),
 ];
 // Create player object
@@ -612,7 +630,10 @@ function animate() {
         ghost.position.y - player.position.y
       ) <
       ghost.radius + player.radius
+      //ghost.position.x === player.position.x &&
+      //ghost.position.y === player.position.y
     ) {
+      console.log("radius: ", ghost.radius);
       if (ghost.scared) {
         ghosts.splice(i, 1);
       } else {
@@ -669,9 +690,11 @@ function animate() {
       // Make ghosts scared
       ghosts.forEach((ghost) => {
         ghost.scared = true;
+        ghost.setGhostScared(true);
 
         setTimeout(() => {
           ghost.scared = false;
+          ghost.setGhostScared(false);
         }, 5000);
       });
     }
