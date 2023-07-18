@@ -5,67 +5,13 @@ const c = canvas.getContext("2d");
 const ghostImage = "./img/ghostSmall.png";
 const ghostScaredImage = "./img/ghostSmallScared.png";
 
-let startTime;
-let timerInterval;
-
-function startGame() {
-  animate();
-
-  canvasContainer.classList.remove("hidden");
-  gameBoardScore.classList.remove("hidden");
-  gameBoardTime.classList.remove("hidden");
-  menuContainer.classList.add("hidden");
-
-  // Timer
-  function startTimer() {
-    startTime = Date.now();
-    timerInterval = setInterval(updateTimer, 100);
-  }
-
-  function updateTimer() {
-    const currentTime = Date.now();
-    const elapsedTime = (currentTime - startTime) / 1000;
-    const elaspedTimeFormatted = elapsedTime.toFixed(1);
-    timerElement.textContent = elaspedTimeFormatted + " seconds";
-  }
-
-  startTimer();
-}
-
-const startButton = document.getElementById("startButton");
-startButton.addEventListener("click", startGame);
-
-// Draw the map
+// Utilites
 const mapGridSize = 40;
-const map = [
-  ["1", "-", "-", "-", "-", "-", "-", "-", "-", "-", "2"],
-  ["|", " ", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
-  ["|", ".", "b", ".", "[", "7", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
-  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
-  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
-  ["|", ".", "b", ".", "[", "+", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
-  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
-  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
-  ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", ".", ".", ".", ".", "p", "|"],
-  ["4", "-", "-", "-", "-", "-", "-", "-", "-", "-", "3"],
-];
-const scoreEl = document.querySelector("#scoreEl");
-const finalScore = document.querySelector("#finalScoreEl");
-const winOrLoseMessage = document.querySelector("#winOrLoseMessage");
-const timerElement = document.getElementById("timer");
-var canvasContainer = document.getElementById("canvasContainer");
-var gameBoardScore = document.getElementById("gameBoardScore");
-var gameBoardTime = document.getElementById("gameBoardTime");
-var menuContainer = document.getElementById("menuContainer");
 
-canvas.width = map[0].length * mapGridSize;
-canvas.height = map.length * mapGridSize;
+// Classes
 
 /**
- * Create Boundaries for the game
+ * Create Boundary class
  */
 class Boundary {
   static width = mapGridSize;
@@ -77,18 +23,13 @@ class Boundary {
     this.image = image;
   }
 
-  /**
-   * Creating rectangles for boundary
-   */
   draw() {
-    //   c.fillStyle = "blue";
-    //   c.fillRect(this.position.x, this.position.y, this.width, this.height);
     c.drawImage(this.image, this.position.x, this.position.y);
   }
 }
 
 /**
- * Create Flowers for the game
+ * Create Flowers class
  */
 class Flower {
   constructor({ position, image }) {
@@ -96,9 +37,6 @@ class Flower {
     this.image = image;
   }
 
-  /**
-   * Creating rectangles for boundary
-   */
   draw() {
     const drawX = this.image.width / 2; // Adjust X position based on the anchor point
     const drawY = this.image.height / 2;
@@ -107,7 +45,7 @@ class Flower {
 }
 
 /**
- * Create the Player Blueprint
+ * Create the Player Class
  */
 class Player {
   constructor({ position, velocity }) {
@@ -119,7 +57,6 @@ class Player {
     this.rotation = 0;
   }
 
-  // Drawing Pacman
   draw() {
     c.save();
     c.translate(this.position.x, this.position.y);
@@ -150,10 +87,17 @@ class Player {
     }
     this.radians += this.openRate;
   }
+
+  reset() {
+    (this.position.x = Boundary.width + Boundary.width / 2),
+      (this.position.y = Boundary.height + Boundary.height / 2),
+      (this.velocity.x = 0),
+      (this.velocity.y = 0);
+  }
 }
 
 /**
- * Create the Ghost Blueprint
+ * Create the Ghost Class
  */
 class Ghost {
   static speed = 2;
@@ -167,17 +111,12 @@ class Ghost {
     this.scared = false;
   }
 
-  // Drawing the Ghost
   draw() {
-    const drawX = this.image.width / 2; // Adjust X position based on the anchor point
+    const drawX = this.image.width / 2;
     const drawY = this.image.height / 2;
     c.beginPath();
     c.drawImage(this.image, this.position.x - drawX, this.position.y - drawY);
-    //c.fillStyle = "rgba(255, 0, 0, 0.5)"; // Adjust the opacity as needed
     c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    //c.fillStyle = this.scared ? "orange" : this.color;
-    //c.fillStyle = this.scared ? "orange" : this.color;
-    //c.fill();
   }
 
   // Moving the Ghost
@@ -195,29 +134,30 @@ class Ghost {
       (this.image = createImage(ghostImage)), c.closePath();
     }
   }
+
+  reset() {
+    if (ghosts.length === 2) {
+      // reset first ghost position
+      ghosts[0].position.x = Boundary.width * 6 + Boundary.width / 2;
+      ghosts[0].position.y = Boundary.height + Boundary.height / 2;
+      // reset second ghost position
+      ghosts[1].position.x = Boundary.width * 6 + Boundary.width / 2;
+      ghosts[1].position.y = Boundary.height * 3 + Boundary.height / 2;
+
+      // Set ghosts velocity
+      ghosts.forEach((ghost) => {
+        ghost.velocity.x = Ghost.speed;
+        ghost.velocity.y = 0;
+      });
+    } else {
+      // create new ghosts.
+      console.error("number of ghosts is: ", ghosts.length);
+    }
+  }
 }
 
-// /**
-//  * Create pellet blueprint
-//  */
-// class Pellet {
-//   constructor({ position }) {
-//     this.position = position;
-//     this.radius = 3;
-//   }
-
-//   // Drawing Pellet
-//   draw() {
-//     c.beginPath();
-//     c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-//     c.fillStyle = "pink";
-//     c.fill();
-//     c.closePath();
-//   }
-// }
-
 /**
- * Create power up blueprint
+ * Create power up class
  */
 class PowerUp {
   constructor({ position }) {
@@ -225,7 +165,6 @@ class PowerUp {
     this.radius = 8;
   }
 
-  // Drawing Pellet
   draw() {
     c.beginPath();
     c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
@@ -234,6 +173,72 @@ class PowerUp {
     c.closePath();
   }
 }
+
+// Query Selectors
+let scoreEl = document.querySelector("#scoreEl");
+let finalScoreEl = document.querySelector("#finalScoreEl");
+const winOrLoseMessage = document.querySelector("#winOrLoseMessage");
+const timerElement = document.getElementById("timer");
+var canvasContainer = document.getElementById("canvasContainer");
+var gameBoardScore = document.getElementById("gameBoardScore");
+var gameBoardTime = document.getElementById("gameBoardTime");
+var menuContainer = document.getElementById("menuContainer");
+const startButton = document.getElementById("startButton");
+
+let startTime;
+let timerInterval;
+let lastKey = "";
+let score = 0;
+// Timer
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(updateTimer, 100);
+}
+
+function updateTimer() {
+  const currentTime = Date.now();
+  const elapsedTime = (currentTime - startTime) / 1000;
+  const elaspedTimeFormatted = elapsedTime.toFixed(1);
+  timerElement.textContent = elaspedTimeFormatted + " seconds";
+}
+
+function startGame() {
+  player.reset();
+  ghosts.forEach((ghost) => ghost.reset());
+  finalScoreEl.innerHTML = scoreEl.innerHTML = 0;
+
+  animate();
+
+  canvasContainer.classList.remove("hidden");
+  gameBoardScore.classList.remove("hidden");
+  gameBoardTime.classList.remove("hidden");
+  menuContainer.classList.add("hidden");
+
+  startTimer();
+}
+
+startButton.addEventListener("click", startGame);
+
+// Draw the map
+
+const map = [
+  ["1", "-", "-", "-", "-", "-", "-", "-", "-", "-", "2"],
+  ["|", " ", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "7", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
+  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
+  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "+", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
+  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
+  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
+  ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
+  ["|", ".", ".", ".", ".", ".", ".", ".", ".", "p", "|"],
+  ["4", "-", "-", "-", "-", "-", "-", "-", "-", "-", "3"],
+];
+
+canvas.width = map[0].length * mapGridSize;
+canvas.height = map.length * mapGridSize;
 
 const pellets = [];
 const boundaries = [];
@@ -262,6 +267,7 @@ const ghosts = [
     image: createImage(ghostImage),
   }),
 ];
+
 // Create player object
 const player = new Player({
   position: {
@@ -289,9 +295,6 @@ const keys = {
     pressed: false,
   },
 };
-
-let lastKey = "";
-let score = 0;
 
 // Populate map with icons & boundaries
 function createImage(src) {
@@ -630,10 +633,8 @@ function animate() {
         ghost.position.y - player.position.y
       ) <
       ghost.radius + player.radius
-      //ghost.position.x === player.position.x &&
-      //ghost.position.y === player.position.y
     ) {
-      console.log("radius: ", ghost.radius);
+      console.log("YOU DIE!");
       if (ghost.scared) {
         ghosts.splice(i, 1);
       } else {
@@ -645,7 +646,6 @@ function animate() {
         time.innerHTML = durationFormatted + " seconds";
         finalScoreEl.innerHTML = score;
         winOrLoseMessage.innerHTML = "You Lose!";
-        finalScore.innerHTML = score;
         startButton.innerHTML = "RESTART GAME";
         menuContainer.classList.remove("hidden");
         canvasContainer.classList.add("hidden");
