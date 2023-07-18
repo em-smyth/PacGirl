@@ -1,3 +1,5 @@
+import Player from "./components/Player.js";
+
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
 
@@ -41,58 +43,6 @@ class Flower {
     const drawX = this.image.width / 2; // Adjust X position based on the anchor point
     const drawY = this.image.height / 2;
     c.drawImage(this.image, this.position.x - drawX, this.position.y - drawY);
-  }
-}
-
-/**
- * Create the Player Class
- */
-class Player {
-  constructor({ position, velocity }) {
-    this.position = position;
-    this.velocity = velocity;
-    this.radius = 16;
-    this.radians = 0.75;
-    this.openRate = 0.12;
-    this.rotation = 0;
-  }
-
-  draw() {
-    c.save();
-    c.translate(this.position.x, this.position.y);
-    c.rotate(this.rotation);
-    c.translate(-this.position.x, -this.position.y);
-    c.beginPath();
-    c.arc(
-      this.position.x,
-      this.position.y,
-      this.radius,
-      this.radians,
-      Math.PI * 2 - this.radians
-    );
-    c.lineTo(this.position.x, this.position.y);
-    c.fillStyle = "yellow";
-    c.fill();
-    c.closePath();
-    c.restore();
-  }
-
-  // Moving Pacman
-  update() {
-    this.draw();
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
-    if (this.radians < 0 || this.radians > 0.75) {
-      this.openRate = -this.openRate;
-    }
-    this.radians += this.openRate;
-  }
-
-  reset() {
-    (this.position.x = Boundary.width + Boundary.width / 2),
-      (this.position.y = Boundary.height + Boundary.height / 2),
-      (this.velocity.x = 0),
-      (this.velocity.y = 0);
   }
 }
 
@@ -269,7 +219,7 @@ const ghosts = [
 ];
 
 // Create player object
-const player = new Player({
+const player = new Player(c, {
   position: {
     x: Boundary.width + Boundary.width / 2,
     y: Boundary.height + Boundary.height / 2,
@@ -279,6 +229,7 @@ const player = new Player({
     y: 0,
   },
 });
+console.log("player: ", player);
 
 // Define an object to keep movement keys state
 const keys = {
