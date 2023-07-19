@@ -100,7 +100,30 @@ class Ghost {
         ghost.velocity.y = 0;
       });
     } else {
-      // create new ghosts.
+      const newGhost = new Ghost({
+        position: {
+          x: Boundary.width * 6 + Boundary.width / 2,
+          y: Boundary.height * 3 + Boundary.height / 2,
+        },
+        velocity: {
+          x: Ghost.speed,
+          y: 0,
+        },
+        image: createImage(ghostImage),
+      });
+      ghosts.push(newGhost);
+      ghosts[0].position.x = Boundary.width * 6 + Boundary.width / 2;
+      ghosts[0].position.y = Boundary.height + Boundary.height / 2;
+      // reset second ghost position
+      ghosts[1].position.x = Boundary.width * 6 + Boundary.width / 2;
+      ghosts[1].position.y = Boundary.height * 3 + Boundary.height / 2;
+
+      // Set ghosts velocity
+      ghosts.forEach((ghost) => {
+        ghost.velocity.x = Ghost.speed;
+        ghost.velocity.y = 0;
+      });
+
       console.error("number of ghosts is: ", ghosts.length);
     }
   }

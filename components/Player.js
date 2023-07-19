@@ -48,6 +48,7 @@ class Player {
       (this.position.y = 40 + 40 / 2),
       (this.velocity.x = 0),
       (this.velocity.y = 0);
+    this.rotation = 0;
   }
 }
 export default Player;
