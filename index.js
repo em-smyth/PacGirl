@@ -1,6 +1,7 @@
 import Player from "./components/Player.js";
 import Ghost from "./components/Ghost.js";
 import PowerUp from "./components/PowerUp.js";
+import Flower from "./components/Flower.js";
 
 const canvasElement = document.querySelector("canvas");
 const canvas = canvasElement.getContext("2d");
@@ -32,41 +33,23 @@ class Boundary {
   }
 }
 
-/**
- * Create Flowers class
- */
-class Flower {
-  constructor({ position, image }) {
-    this.position = position;
-    this.image = image;
-  }
-
-  draw() {
-    const drawX = this.image.width / 2; // Adjust X position based on the anchor point
-    const drawY = this.image.height / 2;
-    canvas.drawImage(
-      this.image,
-      this.position.x - drawX,
-      this.position.y - drawY
-    );
-  }
-}
-
 // /**
-//  * Create power up class
+//  * Create Flowers class
 //  */
-// class PowerUp {
-//   constructor({ position }) {
+// class Flower {
+//   constructor({ position, image }) {
 //     this.position = position;
-//     this.radius = 8;
+//     this.image = image;
 //   }
 
 //   draw() {
-//     canvas.beginPath();
-//     canvas.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-//     canvas.fillStyle = "white";
-//     canvas.fill();
-//     canvas.closePath();
+//     const drawX = this.image.width / 2; // Adjust X position based on the anchor point
+//     const drawY = this.image.height / 2;
+//     canvas.drawImage(
+//       this.image,
+//       this.position.x - drawX,
+//       this.position.y - drawY
+//     );
 //   }
 // }
 
@@ -386,7 +369,7 @@ map.forEach((row, i) => {
         break;
       case ".":
         pellets.push(
-          new Flower({
+          new Flower(canvas, {
             position: {
               x: j * Boundary.width + Boundary.width / 2,
               y: i * Boundary.height + Boundary.height / 2,
