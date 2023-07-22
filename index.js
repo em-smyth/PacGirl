@@ -18,7 +18,10 @@ const canvasContainer = document.getElementById("canvasContainer");
 const gameBoardScore = document.getElementById("gameBoardScore");
 const gameBoardTime = document.getElementById("gameBoardTime");
 const menuContainer = document.getElementById("menuContainer");
+const gameContainer = document.getElementById("gameContainer");
 const startButton = document.getElementById("startButton");
+const howToPlay = document.getElementById("howToPlay");
+const scoreAndTime = document.getElementById("scoreAndTime");
 
 let startTime;
 let timerInterval;
@@ -132,9 +135,12 @@ function finishGame(endGameString) {
   time.innerHTML = durationFormatted + " seconds";
   startButton.innerHTML = "RESTART GAME";
   menuContainer.classList.remove("hidden");
+  scoreAndTime.classList.remove("hidden");
   canvasContainer.classList.add("hidden");
   gameBoardScore.classList.add("hidden");
   gameBoardTime.classList.add("hidden");
+  howToPlay.classList.add("hidden");
+
   finalScoreEl.innerHTML = score;
   winOrLoseMessage.innerHTML = endGameString;
 }

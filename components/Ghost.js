@@ -1,4 +1,4 @@
-const ghostImage = "./img/ghostSmall.png";
+const ghostImage = "../img/ghostSmall.png";
 const ghostScaredImage = "./img/ghostSmallScared.png";
 
 class Ghost {

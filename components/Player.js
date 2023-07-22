@@ -23,7 +23,7 @@ class Player {
       Math.PI * 2 - this.radians
     );
     this.canvas.lineTo(this.position.x, this.position.y);
-    this.canvas.fillStyle = "yellow";
+    this.canvas.fillStyle = "#ff00a8";
     this.canvas.fill();
     this.canvas.closePath();
     this.canvas.restore();

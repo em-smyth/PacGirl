@@ -52,7 +52,7 @@ class GameMap {
                 x: j * Boundary.width + Boundary.width / 2,
                 y: i * Boundary.height + Boundary.height / 2,
               },
-              image: this.createImage("./img/flowerSmall.png"),
+              image: this.createImage("../img/flowerSmallPink.png"),
             })
           );
         }
@@ -69,6 +69,7 @@ class GameMap {
                 x: j * Boundary.width + Boundary.width / 2,
                 y: i * Boundary.height + Boundary.height / 2,
               },
+              image: this.createImage("../img/powerUp.png"),
             })
           );
         }

@@ -4,37 +4,37 @@
 }
 
 .btn {
-  font-family: Arial, Helvetica, sans-serif;
-  text-decoration: none;
-  border: white solid 2px;
-  color: white;
-  padding: 10px;
-  font-size: 18px;
-  background-color: black;
-  margin: 20px;
-  cursor: pointer;
-}
-
-.btn:hover {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Press Start 2P", cursive;
   text-decoration: none;
   border: var(--mainPink) solid 2px;
   color: var(--mainPink);
   padding: 10px;
   font-size: 18px;
-  background-color: black;
+  background-color: white;
+  margin: 20px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  font-family: "Press Start 2P", cursive;
+  text-decoration: none;
+  border: var(--mainPink) solid 2px;
+  color: white;
+  padding: 10px;
+  font-size: 18px;
+  background-color: var(--mainPink);
   margin: 20px;
 }
 
 body {
   margin: 0;
-  background-color: #000000;
-  background-image: url("https://www.transparenttextures.com/patterns/green-dust-and-scratches.png");
-  padding: 10px 20px;
+  background-color: rgb(212, 242, 252);
+  background-image: url("https://www.transparenttextures.com/patterns/fresh-snow.png");
+  padding: 20px;
+  overflow: hidden;
 }
 
 /* Game */
-
 .gameContainer {
   display: flex;
   flex-direction: column;
@@ -48,12 +48,15 @@ body {
 }
 
 p {
-  color: yellow;
+  display: block;
+  color: var(--mainPink);
   font-family: sans-serif;
   font-size: 14px;
-  margin: 10px 0px;
+  /* margin: 10px 0px; */
   font-family: "Press Start 2P", cursive;
-  padding-top: 10px;
+  /* padding-top: 10px; */
+  text-align: center;
+  line-height: 1.7rem;
 }
 
 /* Start Screen */
@@ -63,19 +66,19 @@ p {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  /* visibility: hidden; */
 }
 
 .menu {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
   width: 440px;
   height: 520px;
-  background-color: #85004b;
-  background-image: url("https://www.transparenttextures.com/patterns/cartographer.png");
+  background-color: #f9d5ff;
+  background-image: url("https://www.transparenttextures.com/patterns/fresh-snow.png");
   padding: 40px;
+  box-shadow: 2px 5px 5px rgba(0, 0, 0, 0.363);
 }
 
 .images {
@@ -88,40 +91,39 @@ p {
 
 .images img {
   height: 30px;
-  padding: 20px 0;
-  /* padding: 20px 50px; */
 }
 
 #pacGirl {
-  height: 100px;
+  height: 150px;
 }
 
 h1 {
-  color: white;
+  color: var(--mainPink);
   margin: 0;
   font-family: "Press Start 2P", cursive;
-  padding: 20px 0;
+  padding: 20px;
 }
 
 h2 {
   color: var(--mainPink);
   margin: 0;
   font-family: "Press Start 2P", cursive;
-  padding: 20px 0;
 }
 
 h3 {
   color: var(--mainPink);
   margin: 0;
   font-family: "Press Start 2P", cursive;
-  padding: 20px 0;
   font-size: 16px;
+  text-align: center;
+  padding: 20px;
 }
 
 .scoreTile {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: white;
-  border: black solid 2px;
+  justify-content: space-around;
+  padding: 10px;
+  height: 300px;
 }
