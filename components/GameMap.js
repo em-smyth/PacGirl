@@ -25,7 +25,7 @@ const map = [
 
 class GameMap {
   boundaries = [];
-  pellets = [];
+  flowers = [];
   powerUps = [];
 
   constructor() {
@@ -36,6 +36,44 @@ class GameMap {
     const image = new Image();
     image.src = src;
     return image;
+  }
+
+  resetFlowersAndPowerUps() {
+    this.flowers = [];
+    this.powerUps = [];
+
+    // Draw Flowers
+    map.forEach((row, i) => {
+      row.forEach((symbol, j) => {
+        if (symbol === ".") {
+          this.flowers.push(
+            new Flower(canvas, {
+              position: {
+                x: j * Boundary.width + Boundary.width / 2,
+                y: i * Boundary.height + Boundary.height / 2,
+              },
+              image: this.createImage("./img/flowerSmall.png"),
+            })
+          );
+        }
+      });
+    });
+
+    // Draw Power Ups
+    map.forEach((row, i) => {
+      row.forEach((symbol, j) => {
+        if (symbol === "p") {
+          this.powerUps.push(
+            new PowerUp(canvas, {
+              position: {
+                x: j * Boundary.width + Boundary.width / 2,
+                y: i * Boundary.height + Boundary.height / 2,
+              },
+            })
+          );
+        }
+      });
+    });
   }
 
   drawTheMap() {
@@ -221,27 +259,6 @@ class GameMap {
                   y: i * Boundary.height,
                 },
                 image: this.createImage("./img/pipeConnectorLeft.png"),
-              })
-            );
-            break;
-          case ".":
-            this.pellets.push(
-              new Flower(canvas, {
-                position: {
-                  x: j * Boundary.width + Boundary.width / 2,
-                  y: i * Boundary.height + Boundary.height / 2,
-                },
-                image: this.createImage("./img/flowerSmall.png"),
-              })
-            );
-            break;
-          case "p":
-            this.powerUps.push(
-              new PowerUp(canvas, {
-                position: {
-                  x: j * Boundary.width + Boundary.width / 2,
-                  y: i * Boundary.height + Boundary.height / 2,
-                },
               })
             );
             break;

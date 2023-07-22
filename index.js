@@ -9,23 +9,38 @@ const canvas = canvasElement.getContext("2d");
 // Graphic assets
 const ghostImage = "./img/ghostSmall.png";
 
-const gameMap = new GameMap();
-
 // Query Selectors
-let scoreEl = document.querySelector("#scoreEl");
-let finalScoreEl = document.querySelector("#finalScoreEl");
+const scoreEl = document.getElementById("scoreEl");
+const finalScoreEl = document.getElementById("finalScoreEl");
 const winOrLoseMessage = document.querySelector("#winOrLoseMessage");
 const timerElement = document.getElementById("timer");
-var canvasContainer = document.getElementById("canvasContainer");
-var gameBoardScore = document.getElementById("gameBoardScore");
-var gameBoardTime = document.getElementById("gameBoardTime");
-var menuContainer = document.getElementById("menuContainer");
+const canvasContainer = document.getElementById("canvasContainer");
+const gameBoardScore = document.getElementById("gameBoardScore");
+const gameBoardTime = document.getElementById("gameBoardTime");
+const menuContainer = document.getElementById("menuContainer");
 const startButton = document.getElementById("startButton");
 
 let startTime;
 let timerInterval;
 let lastKey = "";
 let score = 0;
+let ghosts = [];
+
+function startGame() {
+  gameMap.resetFlowersAndPowerUps();
+  score = finalScoreEl.innerHTML = scoreEl.innerHTML = 0;
+  player.reset();
+  spawnGhosts();
+  animate();
+  canvasContainer.classList.remove("hidden");
+  gameBoardScore.classList.remove("hidden");
+  gameBoardTime.classList.remove("hidden");
+  menuContainer.classList.add("hidden");
+
+  startTimer();
+}
+startButton.addEventListener("click", startGame);
+
 // Timer
 function startTimer() {
   startTime = Date.now();
@@ -37,20 +52,6 @@ function updateTimer() {
   const elapsedTime = (currentTime - startTime) / 1000;
   const elaspedTimeFormatted = elapsedTime.toFixed(1);
   timerElement.textContent = elaspedTimeFormatted + " seconds";
-}
-
-function startGame() {
-  player.reset();
-  spawnGhosts();
-  finalScoreEl.innerHTML = scoreEl.innerHTML = 0;
-  animate();
-
-  canvasContainer.classList.remove("hidden");
-  gameBoardScore.classList.remove("hidden");
-  gameBoardTime.classList.remove("hidden");
-  menuContainer.classList.add("hidden");
-
-  startTimer();
 }
 
 function spawnGhosts() {
@@ -80,9 +81,7 @@ function spawnGhosts() {
   ghosts = [ghost1, ghost2];
 }
 
-startButton.addEventListener("click", startGame);
-
-let ghosts = [];
+const gameMap = new GameMap();
 const player = new Player(canvas, {
   position: {
     x: Boundary.width + Boundary.width / 2,
@@ -93,15 +92,6 @@ const player = new Player(canvas, {
     y: 0,
   },
 });
-
-/**
- * Create a new image
- */
-function createImage(src) {
-  const image = new Image();
-  image.src = src;
-  return image;
-}
 
 // Define an object to keep movement keys state
 const keys = {
@@ -118,6 +108,36 @@ const keys = {
     pressed: false,
   },
 };
+
+/**
+ * Create a new image
+ */
+function createImage(src) {
+  const image = new Image();
+  image.src = src;
+  return image;
+}
+
+/**
+ * Display end game screen
+ *
+ * @param endGameString - display this string on the end game screen
+ */
+function finishGame(endGameString) {
+  cancelAnimationFrame(animationId);
+  clearInterval(timerInterval); // Stop updating the timer when the game is won
+  const endTime = Date.now(); // Get the current timestamp when the game ends
+  const duration = (endTime - startTime) / 1000;
+  const durationFormatted = duration.toFixed(1);
+  time.innerHTML = durationFormatted + " seconds";
+  startButton.innerHTML = "RESTART GAME";
+  menuContainer.classList.remove("hidden");
+  canvasContainer.classList.add("hidden");
+  gameBoardScore.classList.add("hidden");
+  gameBoardTime.classList.add("hidden");
+  finalScoreEl.innerHTML = score;
+  winOrLoseMessage.innerHTML = endGameString;
+}
 
 /**
  * Moving Pac-Girl
@@ -227,38 +247,14 @@ function animate() {
       if (ghost.scared) {
         ghosts.splice(i, 1);
       } else {
-        cancelAnimationFrame(animationId);
-        clearInterval(timerInterval); // Stop updating the timer when the game is lost
-        const endTime = Date.now(); // Get the current timestamp when the game ends
-        const duration = (endTime - startTime) / 1000;
-        const durationFormatted = duration.toFixed(1);
-        time.innerHTML = durationFormatted + " seconds";
-        finalScoreEl.innerHTML = score;
-        winOrLoseMessage.innerHTML = "You Lose!";
-        startButton.innerHTML = "RESTART GAME";
-        menuContainer.classList.remove("hidden");
-        canvasContainer.classList.add("hidden");
-        gameBoardScore.classList.add("hidden");
-        gameBoardTime.classList.add("hidden");
+        finishGame("You Lose!");
       }
     }
   }
 
-  // Win condition - all pellets are eaten
-  if (gameMap.pellets.length === 0 || ghosts.length === 0) {
-    cancelAnimationFrame(animationId);
-    clearInterval(timerInterval); // Stop updating the timer when the game is won
-    const endTime = Date.now(); // Get the current timestamp when the game ends
-    const duration = (endTime - startTime) / 1000;
-    const durationFormatted = duration.toFixed(1);
-    time.innerHTML = durationFormatted + " seconds";
-    finalScoreEl.innerHTML = score;
-    winOrLoseMessage.innerHTML = "You Win!";
-    startButton.innerHTML = "RESTART GAME";
-    menuContainer.classList.remove("hidden");
-    canvasContainer.classList.add("hidden");
-    gameBoardScore.classList.add("hidden");
-    gameBoardTime.classList.add("hidden");
+  // Win condition - all flowers are eaten
+  if (gameMap.flowers.length === 0 || ghosts.length === 0) {
+    finishGame("You Win!");
   }
 
   // Draw & Collect Power Up
@@ -288,15 +284,15 @@ function animate() {
     }
   }
 
-  // Draw & Collect pellets
-  for (let i = gameMap.pellets.length - 1; 0 <= i; i--) {
-    const pellet = gameMap.pellets[i];
-    pellet.draw();
+  // Draw & Collect flowers
+  for (let i = gameMap.flowers.length - 1; 0 <= i; i--) {
+    const flower = gameMap.flowers[i];
+    flower.draw();
     if (
-      pellet.position.x === player.position.x &&
-      pellet.position.y === player.position.y
+      flower.position.x === player.position.x &&
+      flower.position.y === player.position.y
     ) {
-      gameMap.pellets.splice(i, 1);
+      gameMap.flowers.splice(i, 1);
       score += 10;
       scoreEl.innerHTML = score;
     }
