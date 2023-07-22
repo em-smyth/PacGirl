@@ -1,3 +1,6 @@
+const ghostImage = "./img/ghostSmall.png";
+const ghostScaredImage = "./img/ghostSmallScared.png";
+
 class Ghost {
   static speed = 2;
   constructor(canvas, { position, velocity, image }) {
@@ -37,11 +40,7 @@ class Ghost {
   }
 
   setGhostScared(isScared) {
-    if (isScared) {
-      (this.image = createImage(ghostScaredImage)), this.canvas.closePath();
-    } else {
-      (this.image = createImage(ghostImage)), this.canvas.closePath();
-    }
+    this.image.src = isScared ? ghostScaredImage : ghostImage;
   }
 }
 

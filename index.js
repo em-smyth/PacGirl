@@ -1,5 +1,6 @@
 import Player from "./components/Player.js";
 import Ghost from "./components/Ghost.js";
+import PowerUp from "./components/PowerUp.js";
 
 const canvasElement = document.querySelector("canvas");
 const canvas = canvasElement.getContext("2d");
@@ -52,61 +53,22 @@ class Flower {
 }
 
 // /**
-//  * Create the Ghost Class
+//  * Create power up class
 //  */
-// class Ghost {
-//   static speed = 2;
-//   constructor({ position, velocity, image }) {
+// class PowerUp {
+//   constructor({ position }) {
 //     this.position = position;
-//     this.velocity = velocity;
-//     this.image = image;
-//     this.radius = 16;
-//     this.prevCollisions = [];
-//     this.speed = 2;
-//     this.scared = false;
+//     this.radius = 8;
 //   }
 
 //   draw() {
-//     const drawX = this.image.width / 2;
-//     const drawY = this.image.height / 2;
 //     canvas.beginPath();
-//     canvas.drawImage(this.image, this.position.x - drawX, this.position.y - drawY);
 //     canvas.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-//   }
-
-//   // Moving the Ghost
-//   update() {
-//     this.draw();
-//     this.position.x += this.velocity.x;
-//     this.position.y += this.velocity.y;
-//   }
-
-//   setGhostScared(isScared) {
-//     if (isScared) {
-//       (this.image = createImage(ghostScaredImage)), canvas.closePath();
-//     } else {
-//       (this.image = createImage(ghostImage)), canvas.closePath();
-//     }
+//     canvas.fillStyle = "white";
+//     canvas.fill();
+//     canvas.closePath();
 //   }
 // }
-
-/**
- * Create power up class
- */
-class PowerUp {
-  constructor({ position }) {
-    this.position = position;
-    this.radius = 8;
-  }
-
-  draw() {
-    canvas.beginPath();
-    canvas.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    canvas.fillStyle = "white";
-    canvas.fill();
-    canvas.closePath();
-  }
-}
 
 // Query Selectors
 let scoreEl = document.querySelector("#scoreEl");
@@ -435,7 +397,7 @@ map.forEach((row, i) => {
         break;
       case "p":
         powerUps.push(
-          new PowerUp({
+          new PowerUp(canvas, {
             position: {
               x: j * Boundary.width + Boundary.width / 2,
               y: i * Boundary.height + Boundary.height / 2,
