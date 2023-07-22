@@ -77,54 +77,10 @@ class Ghost {
   }
 
   setGhostScared(isScared) {
-    console.log("sourceImage: ", this.image.src);
     if (isScared) {
       (this.image = createImage(ghostScaredImage)), c.closePath();
     } else {
       (this.image = createImage(ghostImage)), c.closePath();
-    }
-  }
-
-  reset() {
-    if (ghosts.length === 2) {
-      // reset first ghost position
-      ghosts[0].position.x = Boundary.width * 6 + Boundary.width / 2;
-      ghosts[0].position.y = Boundary.height + Boundary.height / 2;
-      // reset second ghost position
-      ghosts[1].position.x = Boundary.width * 6 + Boundary.width / 2;
-      ghosts[1].position.y = Boundary.height * 3 + Boundary.height / 2;
-
-      // Set ghosts velocity
-      ghosts.forEach((ghost) => {
-        ghost.velocity.x = Ghost.speed;
-        ghost.velocity.y = 0;
-      });
-    } else {
-      const newGhost = new Ghost({
-        position: {
-          x: Boundary.width * 6 + Boundary.width / 2,
-          y: Boundary.height * 3 + Boundary.height / 2,
-        },
-        velocity: {
-          x: Ghost.speed,
-          y: 0,
-        },
-        image: createImage(ghostImage),
-      });
-      ghosts.push(newGhost);
-      ghosts[0].position.x = Boundary.width * 6 + Boundary.width / 2;
-      ghosts[0].position.y = Boundary.height + Boundary.height / 2;
-      // reset second ghost position
-      ghosts[1].position.x = Boundary.width * 6 + Boundary.width / 2;
-      ghosts[1].position.y = Boundary.height * 3 + Boundary.height / 2;
-
-      // Set ghosts velocity
-      ghosts.forEach((ghost) => {
-        ghost.velocity.x = Ghost.speed;
-        ghost.velocity.y = 0;
-      });
-
-      console.error("number of ghosts is: ", ghosts.length);
     }
   }
 }
@@ -177,9 +133,8 @@ function updateTimer() {
 
 function startGame() {
   player.reset();
-  ghosts.forEach((ghost) => ghost.reset());
+  spawnGhosts();
   finalScoreEl.innerHTML = scoreEl.innerHTML = 0;
-
   animate();
 
   canvasContainer.classList.remove("hidden");
@@ -188,6 +143,33 @@ function startGame() {
   menuContainer.classList.add("hidden");
 
   startTimer();
+}
+
+function spawnGhosts() {
+  ghosts = [];
+  const ghost1 = new Ghost({
+    position: {
+      x: Boundary.width * 6 + Boundary.width / 2,
+      y: Boundary.height + Boundary.height / 2,
+    },
+    velocity: {
+      x: Ghost.speed,
+      y: 0,
+    },
+    image: createImage(ghostImage),
+  });
+  const ghost2 = new Ghost({
+    position: {
+      x: Boundary.width * 6 + Boundary.width / 2,
+      y: Boundary.height * 3 + Boundary.height / 2,
+    },
+    velocity: {
+      x: Ghost.speed,
+      y: 0,
+    },
+    image: createImage(ghostImage),
+  });
+  ghosts = [ghost1, ghost2];
 }
 
 startButton.addEventListener("click", startGame);
@@ -216,30 +198,7 @@ canvas.height = map.length * mapGridSize;
 const pellets = [];
 const boundaries = [];
 const powerUps = [];
-const ghosts = [
-  new Ghost({
-    position: {
-      x: Boundary.width * 6 + Boundary.width / 2,
-      y: Boundary.height + Boundary.height / 2,
-    },
-    velocity: {
-      x: Ghost.speed,
-      y: 0,
-    },
-    image: createImage(ghostImage),
-  }),
-  new Ghost({
-    position: {
-      x: Boundary.width * 6 + Boundary.width / 2,
-      y: Boundary.height * 3 + Boundary.height / 2,
-    },
-    velocity: {
-      x: Ghost.speed,
-      y: 0,
-    },
-    image: createImage(ghostImage),
-  }),
-];
+let ghosts = [];
 
 // Create player object
 const player = new Player(c, {
@@ -252,7 +211,6 @@ const player = new Player(c, {
     y: 0,
   },
 });
-console.log("player: ", player);
 
 // Define an object to keep movement keys state
 const keys = {
@@ -508,7 +466,6 @@ function circleCollidesWithRectangle({ circle, rectangle }) {
 let animationId;
 function animate() {
   animationId = requestAnimationFrame(animate);
-  // console.log(animationId);
   c.clearRect(0, 0, canvas.width, canvas.height);
 
   if (keys.w.pressed && lastKey === "w") {
@@ -608,7 +565,6 @@ function animate() {
       ) <
       ghost.radius + player.radius
     ) {
-      console.log("YOU DIE!");
       if (ghost.scared) {
         ghosts.splice(i, 1);
       } else {
@@ -631,7 +587,7 @@ function animate() {
 
   // Win condition - all pellets are eaten
 
-  if (pellets.length === 0) {
+  if (pellets.length === 0 || ghosts.length === 0) {
     cancelAnimationFrame(animationId);
     clearInterval(timerInterval); // Stop updating the timer when the game is won
     const endTime = Date.now(); // Get the current timestamp when the game ends
