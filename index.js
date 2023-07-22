@@ -2,6 +2,7 @@ import Player from "./components/Player.js";
 import Ghost from "./components/Ghost.js";
 import PowerUp from "./components/PowerUp.js";
 import Flower from "./components/Flower.js";
+import Boundary from "./components/Boundry.js";
 
 const canvasElement = document.querySelector("canvas");
 const canvas = canvasElement.getContext("2d");
@@ -15,23 +16,23 @@ const mapGridSize = 40;
 
 // Classes
 
-/**
- * Create Boundary class
- */
-class Boundary {
-  static width = mapGridSize;
-  static height = mapGridSize;
-  constructor({ position, image }) {
-    this.position = position;
-    this.width = mapGridSize;
-    this.height = mapGridSize;
-    this.image = image;
-  }
+// /**
+//  * Create Boundary class
+//  */
+// class Boundary {
+//   static width = mapGridSize;
+//   static height = mapGridSize;
+//   constructor({ position, image }) {
+//     this.position = position;
+//     this.width = mapGridSize;
+//     this.height = mapGridSize;
+//     this.image = image;
+//   }
 
-  draw() {
-    canvas.drawImage(this.image, this.position.x, this.position.y);
-  }
-}
+//   draw() {
+//     canvas.drawImage(this.image, this.position.x, this.position.y);
+//   }
+// }
 
 // /**
 //  * Create Flowers class
@@ -190,7 +191,7 @@ map.forEach((row, i) => {
     switch (symbol) {
       case "-":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: Boundary.width * j,
               y: Boundary.height * i,
@@ -201,7 +202,7 @@ map.forEach((row, i) => {
         break;
       case "|":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: Boundary.width * j,
               y: Boundary.height * i,
@@ -212,7 +213,7 @@ map.forEach((row, i) => {
         break;
       case "1":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: Boundary.width * j,
               y: Boundary.height * i,
@@ -223,7 +224,7 @@ map.forEach((row, i) => {
         break;
       case "2":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: Boundary.width * j,
               y: Boundary.height * i,
@@ -234,7 +235,7 @@ map.forEach((row, i) => {
         break;
       case "3":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: Boundary.width * j,
               y: Boundary.height * i,
@@ -245,7 +246,7 @@ map.forEach((row, i) => {
         break;
       case "4":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: Boundary.width * j,
               y: Boundary.height * i,
@@ -256,7 +257,7 @@ map.forEach((row, i) => {
         break;
       case "b":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: Boundary.width * j,
               y: Boundary.height * i,
@@ -267,7 +268,7 @@ map.forEach((row, i) => {
         break;
       case "[":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
@@ -278,7 +279,7 @@ map.forEach((row, i) => {
         break;
       case "]":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
@@ -289,7 +290,7 @@ map.forEach((row, i) => {
         break;
       case "_":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
@@ -300,7 +301,7 @@ map.forEach((row, i) => {
         break;
       case "^":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
@@ -311,7 +312,7 @@ map.forEach((row, i) => {
         break;
       case "+":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
@@ -322,7 +323,7 @@ map.forEach((row, i) => {
         break;
       case "5":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
@@ -334,7 +335,7 @@ map.forEach((row, i) => {
         break;
       case "6":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
@@ -346,7 +347,7 @@ map.forEach((row, i) => {
         break;
       case "7":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
@@ -358,7 +359,7 @@ map.forEach((row, i) => {
         break;
       case "8":
         boundaries.push(
-          new Boundary({
+          new Boundary(canvas, {
             position: {
               x: j * Boundary.width,
               y: i * Boundary.height,
