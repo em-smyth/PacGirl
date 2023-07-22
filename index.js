@@ -1,7 +1,8 @@
 import Player from "./components/Player.js";
+import Ghost from "./components/Ghost.js";
 
-const canvas = document.querySelector("canvas");
-const c = canvas.getContext("2d");
+const canvasElement = document.querySelector("canvas");
+const canvas = canvasElement.getContext("2d");
 
 // Graphic assets
 const ghostImage = "./img/ghostSmall.png";
@@ -26,7 +27,7 @@ class Boundary {
   }
 
   draw() {
-    c.drawImage(this.image, this.position.x, this.position.y);
+    canvas.drawImage(this.image, this.position.x, this.position.y);
   }
 }
 
@@ -42,48 +43,52 @@ class Flower {
   draw() {
     const drawX = this.image.width / 2; // Adjust X position based on the anchor point
     const drawY = this.image.height / 2;
-    c.drawImage(this.image, this.position.x - drawX, this.position.y - drawY);
+    canvas.drawImage(
+      this.image,
+      this.position.x - drawX,
+      this.position.y - drawY
+    );
   }
 }
 
-/**
- * Create the Ghost Class
- */
-class Ghost {
-  static speed = 2;
-  constructor({ position, velocity, image }) {
-    this.position = position;
-    this.velocity = velocity;
-    this.image = image;
-    this.radius = 16;
-    this.prevCollisions = [];
-    this.speed = 2;
-    this.scared = false;
-  }
+// /**
+//  * Create the Ghost Class
+//  */
+// class Ghost {
+//   static speed = 2;
+//   constructor({ position, velocity, image }) {
+//     this.position = position;
+//     this.velocity = velocity;
+//     this.image = image;
+//     this.radius = 16;
+//     this.prevCollisions = [];
+//     this.speed = 2;
+//     this.scared = false;
+//   }
 
-  draw() {
-    const drawX = this.image.width / 2;
-    const drawY = this.image.height / 2;
-    c.beginPath();
-    c.drawImage(this.image, this.position.x - drawX, this.position.y - drawY);
-    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-  }
+//   draw() {
+//     const drawX = this.image.width / 2;
+//     const drawY = this.image.height / 2;
+//     canvas.beginPath();
+//     canvas.drawImage(this.image, this.position.x - drawX, this.position.y - drawY);
+//     canvas.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+//   }
 
-  // Moving the Ghost
-  update() {
-    this.draw();
-    this.position.x += this.velocity.x;
-    this.position.y += this.velocity.y;
-  }
+//   // Moving the Ghost
+//   update() {
+//     this.draw();
+//     this.position.x += this.velocity.x;
+//     this.position.y += this.velocity.y;
+//   }
 
-  setGhostScared(isScared) {
-    if (isScared) {
-      (this.image = createImage(ghostScaredImage)), c.closePath();
-    } else {
-      (this.image = createImage(ghostImage)), c.closePath();
-    }
-  }
-}
+//   setGhostScared(isScared) {
+//     if (isScared) {
+//       (this.image = createImage(ghostScaredImage)), canvas.closePath();
+//     } else {
+//       (this.image = createImage(ghostImage)), canvas.closePath();
+//     }
+//   }
+// }
 
 /**
  * Create power up class
@@ -95,11 +100,11 @@ class PowerUp {
   }
 
   draw() {
-    c.beginPath();
-    c.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
-    c.fillStyle = "white";
-    c.fill();
-    c.closePath();
+    canvas.beginPath();
+    canvas.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2);
+    canvas.fillStyle = "white";
+    canvas.fill();
+    canvas.closePath();
   }
 }
 
@@ -147,7 +152,7 @@ function startGame() {
 
 function spawnGhosts() {
   ghosts = [];
-  const ghost1 = new Ghost({
+  const ghost1 = new Ghost(canvas, {
     position: {
       x: Boundary.width * 6 + Boundary.width / 2,
       y: Boundary.height + Boundary.height / 2,
@@ -158,7 +163,7 @@ function spawnGhosts() {
     },
     image: createImage(ghostImage),
   });
-  const ghost2 = new Ghost({
+  const ghost2 = new Ghost(canvas, {
     position: {
       x: Boundary.width * 6 + Boundary.width / 2,
       y: Boundary.height * 3 + Boundary.height / 2,
@@ -192,8 +197,8 @@ const map = [
   ["4", "-", "-", "-", "-", "-", "-", "-", "-", "-", "3"],
 ];
 
-canvas.width = map[0].length * mapGridSize;
-canvas.height = map.length * mapGridSize;
+canvasElement.width = map[0].length * mapGridSize;
+canvasElement.height = map.length * mapGridSize;
 
 const pellets = [];
 const boundaries = [];
@@ -201,7 +206,7 @@ const powerUps = [];
 let ghosts = [];
 
 // Create player object
-const player = new Player(c, {
+const player = new Player(canvas, {
   position: {
     x: Boundary.width + Boundary.width / 2,
     y: Boundary.height + Boundary.height / 2,
@@ -466,7 +471,7 @@ function circleCollidesWithRectangle({ circle, rectangle }) {
 let animationId;
 function animate() {
   animationId = requestAnimationFrame(animate);
-  c.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
   if (keys.w.pressed && lastKey === "w") {
     for (let i = 0; i < boundaries.length; i++) {
