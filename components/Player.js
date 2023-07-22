@@ -1,6 +1,3 @@
-/**
- * Create the Player Class
- */
 class Player {
   constructor(canvas, { position, velocity }) {
     this.canvas = canvas;

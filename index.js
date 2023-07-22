@@ -1,58 +1,15 @@
 import Player from "./components/Player.js";
 import Ghost from "./components/Ghost.js";
-import PowerUp from "./components/PowerUp.js";
-import Flower from "./components/Flower.js";
-import Boundary from "./components/Boundry.js";
+import Boundary from "./components/Boundary.js";
+import GameMap from "./components/GameMap.js";
 
 const canvasElement = document.querySelector("canvas");
 const canvas = canvasElement.getContext("2d");
 
 // Graphic assets
 const ghostImage = "./img/ghostSmall.png";
-const ghostScaredImage = "./img/ghostSmallScared.png";
 
-// Utilites
-const mapGridSize = 40;
-
-// Classes
-
-// /**
-//  * Create Boundary class
-//  */
-// class Boundary {
-//   static width = mapGridSize;
-//   static height = mapGridSize;
-//   constructor({ position, image }) {
-//     this.position = position;
-//     this.width = mapGridSize;
-//     this.height = mapGridSize;
-//     this.image = image;
-//   }
-
-//   draw() {
-//     canvas.drawImage(this.image, this.position.x, this.position.y);
-//   }
-// }
-
-// /**
-//  * Create Flowers class
-//  */
-// class Flower {
-//   constructor({ position, image }) {
-//     this.position = position;
-//     this.image = image;
-//   }
-
-//   draw() {
-//     const drawX = this.image.width / 2; // Adjust X position based on the anchor point
-//     const drawY = this.image.height / 2;
-//     canvas.drawImage(
-//       this.image,
-//       this.position.x - drawX,
-//       this.position.y - drawY
-//     );
-//   }
-// }
+const gameMap = new GameMap();
 
 // Query Selectors
 let scoreEl = document.querySelector("#scoreEl");
@@ -125,33 +82,7 @@ function spawnGhosts() {
 
 startButton.addEventListener("click", startGame);
 
-// Draw the map
-
-const map = [
-  ["1", "-", "-", "-", "-", "-", "-", "-", "-", "-", "2"],
-  ["|", " ", ".", ".", ".", ".", ".", ".", ".", ".", "|"],
-  ["|", ".", "b", ".", "[", "7", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
-  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
-  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
-  ["|", ".", "b", ".", "[", "+", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", "_", ".", ".", ".", ".", "|"],
-  ["|", ".", "[", "]", ".", ".", ".", "[", "]", ".", "|"],
-  ["|", ".", ".", ".", ".", "^", ".", ".", ".", ".", "|"],
-  ["|", ".", "b", ".", "[", "5", "]", ".", "b", ".", "|"],
-  ["|", ".", ".", ".", ".", ".", ".", ".", ".", "p", "|"],
-  ["4", "-", "-", "-", "-", "-", "-", "-", "-", "-", "3"],
-];
-
-canvasElement.width = map[0].length * mapGridSize;
-canvasElement.height = map.length * mapGridSize;
-
-const pellets = [];
-const boundaries = [];
-const powerUps = [];
 let ghosts = [];
-
-// Create player object
 const player = new Player(canvas, {
   position: {
     x: Boundary.width + Boundary.width / 2,
@@ -162,6 +93,15 @@ const player = new Player(canvas, {
     y: 0,
   },
 });
+
+/**
+ * Create a new image
+ */
+function createImage(src) {
+  const image = new Image();
+  image.src = src;
+  return image;
+}
 
 // Define an object to keep movement keys state
 const keys = {
@@ -179,249 +119,17 @@ const keys = {
   },
 };
 
-// Populate map with icons & boundaries
-function createImage(src) {
-  const image = new Image();
-  image.src = src;
-  return image;
-}
-
-map.forEach((row, i) => {
-  row.forEach((symbol, j) => {
-    switch (symbol) {
-      case "-":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: Boundary.width * j,
-              y: Boundary.height * i,
-            },
-            image: createImage("./img/pipeHorizontal.png"),
-          })
-        );
-        break;
-      case "|":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: Boundary.width * j,
-              y: Boundary.height * i,
-            },
-            image: createImage("./img/pipeVertical.png"),
-          })
-        );
-        break;
-      case "1":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: Boundary.width * j,
-              y: Boundary.height * i,
-            },
-            image: createImage("./img/pipeCorner1.png"),
-          })
-        );
-        break;
-      case "2":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: Boundary.width * j,
-              y: Boundary.height * i,
-            },
-            image: createImage("./img/pipeCorner2.png"),
-          })
-        );
-        break;
-      case "3":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: Boundary.width * j,
-              y: Boundary.height * i,
-            },
-            image: createImage("./img/pipeCorner3.png"),
-          })
-        );
-        break;
-      case "4":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: Boundary.width * j,
-              y: Boundary.height * i,
-            },
-            image: createImage("./img/pipeCorner4.png"),
-          })
-        );
-        break;
-      case "b":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: Boundary.width * j,
-              y: Boundary.height * i,
-            },
-            image: createImage("./img/block.png"),
-          })
-        );
-        break;
-      case "[":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            image: createImage("./img/capLeft.png"),
-          })
-        );
-        break;
-      case "]":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            image: createImage("./img/capRight.png"),
-          })
-        );
-        break;
-      case "_":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            image: createImage("./img/capBottom.png"),
-          })
-        );
-        break;
-      case "^":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            image: createImage("./img/capTop.png"),
-          })
-        );
-        break;
-      case "+":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            image: createImage("./img/pipeCross.png"),
-          })
-        );
-        break;
-      case "5":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            color: "blue",
-            image: createImage("./img/pipeConnectorTop.png"),
-          })
-        );
-        break;
-      case "6":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            color: "blue",
-            image: createImage("./img/pipeConnectorRight.png"),
-          })
-        );
-        break;
-      case "7":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            color: "blue",
-            image: createImage("./img/pipeConnectorBottom.png"),
-          })
-        );
-        break;
-      case "8":
-        boundaries.push(
-          new Boundary(canvas, {
-            position: {
-              x: j * Boundary.width,
-              y: i * Boundary.height,
-            },
-            image: createImage("./img/pipeConnectorLeft.png"),
-          })
-        );
-        break;
-      case ".":
-        pellets.push(
-          new Flower(canvas, {
-            position: {
-              x: j * Boundary.width + Boundary.width / 2,
-              y: i * Boundary.height + Boundary.height / 2,
-            },
-            image: createImage("./img/flowerSmall.png"),
-          })
-        );
-        break;
-      case "p":
-        powerUps.push(
-          new PowerUp(canvas, {
-            position: {
-              x: j * Boundary.width + Boundary.width / 2,
-              y: i * Boundary.height + Boundary.height / 2,
-            },
-          })
-        );
-        break;
-    }
-  });
-});
-
 /**
- * Check if the pacman is colliding with boundaries
+ * Moving Pac-Girl
  */
-function circleCollidesWithRectangle({ circle, rectangle }) {
-  const padding = Boundary.width / 2 - circle.radius - 1;
-  return (
-    circle.position.y - circle.radius + circle.velocity.y <=
-      rectangle.position.y + rectangle.height + padding &&
-    circle.position.x + circle.radius + circle.velocity.x >=
-      rectangle.position.x - padding &&
-    circle.position.y + circle.radius + circle.velocity.y >=
-      rectangle.position.y - padding &&
-    circle.position.x - circle.radius + circle.velocity.x <=
-      rectangle.position.x + rectangle.width + padding
-  );
-}
-
-/**
- *Moving Pac-Girl
- */
-
 let animationId;
 function animate() {
   animationId = requestAnimationFrame(animate);
   canvas.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
   if (keys.w.pressed && lastKey === "w") {
-    for (let i = 0; i < boundaries.length; i++) {
-      const boundary = boundaries[i];
+    for (let i = 0; i < gameMap.boundaries.length; i++) {
+      const boundary = gameMap.boundaries[i];
       if (
         circleCollidesWithRectangle({
           circle: {
@@ -441,8 +149,8 @@ function animate() {
       }
     }
   } else if (keys.a.pressed && lastKey === "a") {
-    for (let i = 0; i < boundaries.length; i++) {
-      const boundary = boundaries[i];
+    for (let i = 0; i < gameMap.boundaries.length; i++) {
+      const boundary = gameMap.boundaries[i];
       if (
         circleCollidesWithRectangle({
           circle: {
@@ -462,8 +170,8 @@ function animate() {
       }
     }
   } else if (keys.s.pressed && lastKey === "s") {
-    for (let i = 0; i < boundaries.length; i++) {
-      const boundary = boundaries[i];
+    for (let i = 0; i < gameMap.boundaries.length; i++) {
+      const boundary = gameMap.boundaries[i];
       if (
         circleCollidesWithRectangle({
           circle: {
@@ -483,8 +191,8 @@ function animate() {
       }
     }
   } else if (keys.d.pressed && lastKey === "d") {
-    for (let i = 0; i < boundaries.length; i++) {
-      const boundary = boundaries[i];
+    for (let i = 0; i < gameMap.boundaries.length; i++) {
+      const boundary = gameMap.boundaries[i];
       if (
         circleCollidesWithRectangle({
           circle: {
@@ -537,8 +245,7 @@ function animate() {
   }
 
   // Win condition - all pellets are eaten
-
-  if (pellets.length === 0 || ghosts.length === 0) {
+  if (gameMap.pellets.length === 0 || ghosts.length === 0) {
     cancelAnimationFrame(animationId);
     clearInterval(timerInterval); // Stop updating the timer when the game is won
     const endTime = Date.now(); // Get the current timestamp when the game ends
@@ -554,9 +261,9 @@ function animate() {
     gameBoardTime.classList.add("hidden");
   }
 
-  // Generate Power Up
-  for (let i = powerUps.length - 1; 0 <= i; i--) {
-    const powerUp = powerUps[i];
+  // Draw & Collect Power Up
+  for (let i = gameMap.powerUps.length - 1; 0 <= i; i--) {
+    const powerUp = gameMap.powerUps[i];
     powerUp.draw();
     // Player collides with PowerUp
     if (
@@ -566,7 +273,7 @@ function animate() {
       ) <
       powerUp.radius + player.radius
     ) {
-      powerUps.splice(i, 1);
+      gameMap.powerUps.splice(i, 1);
 
       // Make ghosts scared
       ghosts.forEach((ghost) => {
@@ -581,29 +288,20 @@ function animate() {
     }
   }
 
-  // Touch pellets here
-  for (let i = pellets.length - 1; 0 <= i; i--) {
-    const pellet = pellets[i];
+  // Draw & Collect pellets
+  for (let i = gameMap.pellets.length - 1; 0 <= i; i--) {
+    const pellet = gameMap.pellets[i];
     pellet.draw();
-
-    // if (
-    //   Math.hypot(
-    //     pellet.position.x - player.position.x,
-    //     pellet.position.y - player.position.y
-    //   ) <
-    //   pellet.radius + player.radius
-    // )
     if (
       pellet.position.x === player.position.x &&
       pellet.position.y === player.position.y
     ) {
-      pellets.splice(i, 1);
+      gameMap.pellets.splice(i, 1);
       score += 10;
       scoreEl.innerHTML = score;
     }
   }
-
-  boundaries.forEach((boundary) => {
+  gameMap.boundaries.forEach((boundary) => {
     boundary.draw();
     if (circleCollidesWithRectangle({ circle: player, rectangle: boundary })) {
       player.velocity.x = 0;
@@ -617,7 +315,7 @@ function animate() {
     ghost.update();
 
     const collisions = [];
-    boundaries.forEach((boundary) => {
+    gameMap.boundaries.forEach((boundary) => {
       if (
         !collisions.includes("right") &&
         circleCollidesWithRectangle({
@@ -761,3 +459,20 @@ window.addEventListener("keyup", ({ key }) => {
       break;
   }
 });
+
+/**
+ * Check if the pacman is colliding with boundaries
+ */
+function circleCollidesWithRectangle({ circle, rectangle }) {
+  const padding = Boundary.width / 2 - circle.radius - 1;
+  return (
+    circle.position.y - circle.radius + circle.velocity.y <=
+      rectangle.position.y + rectangle.height + padding &&
+    circle.position.x + circle.radius + circle.velocity.x >=
+      rectangle.position.x - padding &&
+    circle.position.y + circle.radius + circle.velocity.y >=
+      rectangle.position.y - padding &&
+    circle.position.x - circle.radius + circle.velocity.x <=
+      rectangle.position.x + rectangle.width + padding
+  );
+}

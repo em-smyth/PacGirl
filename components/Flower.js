@@ -1,6 +1,3 @@
-/**
- * Create Flowers class
- */
 class Flower {
   constructor(canvas, { position, image }) {
     this.canvas = canvas;
